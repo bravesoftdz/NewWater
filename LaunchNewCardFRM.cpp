@@ -601,6 +601,7 @@ void __fastcall TLaunchNewUserCardFRM::LaunchNewCardBTNClick(TObject *Sender)
                                 return;
                             }
                             //end write 0
+
 							String DateofLaunchCard;
 							SYSTEMTIME tmpsystime;
 							GetLocalTime(&tmpsystime);

@@ -407,6 +407,75 @@ void TCardWithDrawMoneyFRM::Function_WithDraw(double WDMoney)
 					writetmpbalance = (int)writetmpbalance%256;
 					writebalance[3] = (int)writetmpbalance;
 
+                    //begin pacarddll
+                    unsigned char sendbuf[26];
+                    unsigned char sendbuflen = 26;
+                    unsigned char senddelay = Delayms;
+                    unsigned char recbuf[140];
+                    unsigned char recbuflen;
+                    unsigned char pblock = (secnum+2)*4+0;
+                    unsigned char pmimamode = 0x60;
+                    unsigned char pcommand = 0x01;
+                    unsigned char pkeymode = CARDPasswordEdition;
+                    unsigned char pkey[6];
+                    memcpy(pkey,CARDPassword,6);
+                    unsigned char comno[5];
+                    memcpy(comno,readcomno,5);
+                    pblock = (secnum+1)*4+2;
+                    pmimamode = 0x60;
+                    pcommand = 0x01;
+                    pkeymode = CARDPasswordEdition;
+                    ZeroMemory(sendbuf,26);
+                    sendbuf[0] = pblock;//扇区×4+块号
+                    sendbuf[1] = pmimamode;//固定为0x60
+                    sendbuf[2] = pcommand;//命令字：1为读，2为写
+                    sendbuf[3] = pkeymode;
+                    sendbuf[4] = pkey[0];
+                    sendbuf[5] = pkey[1];
+                    sendbuf[6] = pkey[2];
+                    sendbuf[7] = pkey[3];
+                    sendbuf[8] = pkey[4];
+                    sendbuf[9] = pkey[5];
+
+                    WORD pstatus;
+                    pstatus = pacarddllproc(comno,sendbuflen,sendbuf,&recbuflen,recbuf,senddelay);
+                    if((0 == pstatus)&&(0 == recbuf[2]))
+                    {
+                        //入库
+                        unsigned char precbuf[16];
+                        ZeroMemory(precbuf, 16);
+                        memcpy(precbuf, &recbuf[10], 16);
+                        if((0x55 == precbuf[14])&&(0xaa == precbuf[15]))
+                        {
+                            double xf1;
+                            double xf2;
+                            int jqh;
+                            int cjkh;
+                            xf1 = ((double)precbuf[0]+(double)precbuf[1]*256+
+                                    (double)precbuf[2]*256*256+(double)precbuf[3]*256*256*256)/100;
+                            xf2 = ((double)(precbuf[4]^0xff)+(double)(precbuf[5]^0xff)*256+
+                                    (double)(precbuf[6]^0xff)*256*256+(double)(precbuf[7]^0xff)*256*256*256)/100;
+                            if(xf1 == xf2)
+                            {
+                                jqh = (int)precbuf[8]*256+(int)precbuf[9];
+                                cjkh = (int)precbuf[10]*256*256*256+(int)precbuf[11]*256*256+
+                                        (int)precbuf[12]*256+(int)precbuf[13];
+                                //入库操作
+                                ADOWithDrawQuery->Close();
+                                String tjsqlstr = "insert into WTJ values(:JH,:CJKH,:XFZE,:SCSJ)";
+                                ADOWithDrawQuery->SQL->Clear();
+                                ADOWithDrawQuery->SQL->Add(tjsqlstr);
+                                ADOWithDrawQuery->Parameters->ParamByName("JH")->Value = jqh;
+                                ADOWithDrawQuery->Parameters->ParamByName("CJKH")->Value = cjkh;
+                            //    ReChargeADOQ->Parameters->ParamByName("KS")->Value = cardks;
+                                ADOWithDrawQuery->Parameters->ParamByName("XFZE")->Value = xf1;
+                                ADOWithDrawQuery->Parameters->ParamByName("SCSJ")->Value = DateTimeToStr(Now());
+                                ADOWithDrawQuery->ExecSQL();
+                            }
+                        }
+                    }
+                    //end pacarddll
+
 					if(LaunchNewCard)
 					{
 						String DateofLaunchCard;

@@ -77,6 +77,95 @@ void __fastcall TDeleteCardInfoFrom::DeleteCardInfoBTNClick(TObject *Sender)
 			status = ClearCardInfoProc(readcomno, keymode, secnum, key, Delayms);
 			if(0 == status)
 			{
+            	unsigned char mode;
+                unsigned char dwmm[6];
+                unsigned char daytime[4];
+                unsigned char kh[4];
+                unsigned char balance[4];
+                unsigned char cardtype[1];
+                unsigned char czmm[3];
+                unsigned char synum[3];
+
+                unsigned char sendbuflen = 26;
+                unsigned char sendbuf[26];
+                ZeroMemory(sendbuf,26);
+                unsigned char recbuf[140];
+                unsigned char recbuflen;
+                ZeroMemory(recbuf, 140);
+                unsigned char createCRC[16];
+                unsigned char CRC[2];
+                ZeroMemory(createCRC, 16);
+                ZeroMemory(CRC, 2);
+            //写0值到(n+1)*4+1
+                ZeroMemory(sendbuf,26);
+                ZeroMemory(recbuf, 140);
+                ZeroMemory(createCRC, 16);
+                ZeroMemory(CRC, 2);
+
+                sendbuf[0] = (secnum+1)*4+1;//扇区×4+块号
+                sendbuf[1] = 0x60;//固定为0x60
+                sendbuf[2] = 2;//命令字：1为读，2为写
+                sendbuf[3] = keymode;
+                sendbuf[4] = key[0];
+                sendbuf[5] = key[1];
+                sendbuf[6] = key[2];
+                sendbuf[7] = key[3];
+                sendbuf[8] = key[4];
+                sendbuf[9] = key[5];
+
+                memcpy(createCRC, &sendbuf[10], 16);
+                CRCProc(createCRC, 14, CRC);
+                sendbuf[24] = CRC[0];
+                sendbuf[25] = CRC[1];
+
+                WORD limitStatus = pacarddllproc(readcomno,sendbuflen,sendbuf,&recbuflen,recbuf,Delayms);
+
+            //写0值到(n+1)*4+2
+                ZeroMemory(sendbuf,26);
+                ZeroMemory(recbuf, 140);
+                ZeroMemory(createCRC, 16);
+                ZeroMemory(CRC, 2);
+
+                sendbuf[0] = (secnum+1)*4+2;//扇区×4+块号
+                sendbuf[1] = 0x60;//固定为0x60
+                sendbuf[2] = 2;//命令字：1为读，2为写
+                sendbuf[3] = keymode;
+                sendbuf[4] = key[0];
+                sendbuf[5] = key[1];
+                sendbuf[6] = key[2];
+                sendbuf[7] = key[3];
+                sendbuf[8] = key[4];
+                sendbuf[9] = key[5];
+
+                memcpy(createCRC, &sendbuf[10], 16);
+                CRCProc(createCRC, 14, CRC);
+                sendbuf[24] = CRC[0];
+                sendbuf[25] = CRC[1];
+                limitStatus = pacarddllproc(readcomno,sendbuflen,sendbuf,&recbuflen,recbuf,Delayms);
+
+                //(n+2)*4+0
+                ZeroMemory(sendbuf,26);
+                ZeroMemory(recbuf, 140);
+                ZeroMemory(createCRC, 16);
+                ZeroMemory(CRC, 2);
+
+                sendbuf[0] = (secnum+2)*4+0;//扇区×4+块号
+                sendbuf[1] = 0x60;//固定为0x60
+                sendbuf[2] = 2;//命令字：1为读，2为写
+                sendbuf[3] = keymode;
+                sendbuf[4] = key[0];
+                sendbuf[5] = key[1];
+                sendbuf[6] = key[2];
+                sendbuf[7] = key[3];
+                sendbuf[8] = key[4];
+                sendbuf[9] = key[5];
+
+                memcpy(createCRC, &sendbuf[10], 16);
+                CRCProc(createCRC, 14, CRC);
+                sendbuf[24] = CRC[0];
+                sendbuf[25] = CRC[1];
+                limitStatus = pacarddllproc(readcomno,sendbuflen,sendbuf,&recbuflen,recbuf,Delayms);
+
 				beepofreaddll(readcomno, '10');
 				DeleteCardInfoMemo->Lines->Add("清卡信息成功！");
 			}

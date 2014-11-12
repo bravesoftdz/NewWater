@@ -413,6 +413,87 @@ void __fastcall TCardCanceledFRM::cxButton2Click(TObject *Sender)
 
 					if(0 == status)
 					{
+                    	//写FK与HF到(n+1)*4+1
+                        unsigned char sendbuflen = 26;
+                        unsigned char sendbuf[26];
+                        ZeroMemory(sendbuf,26);
+                        unsigned char recbuf[140];
+                        unsigned char recbuflen;
+                        ZeroMemory(recbuf, 140);
+                        unsigned char createCRC[16];
+                        unsigned char CRC[2];
+                        ZeroMemory(createCRC, 16);
+                        ZeroMemory(CRC, 2);
+
+                        sendbuf[0] = (secnum+1)*4+1;//扇区×4+块号
+                        sendbuf[1] = 0x60;//固定为0x60
+                        sendbuf[2] = 2;//命令字：1为读，2为写
+                        sendbuf[3] = keymode;
+                        sendbuf[4] = key[0];
+                        sendbuf[5] = key[1];
+                        sendbuf[6] = key[2];
+                        sendbuf[7] = key[3];
+                        sendbuf[8] = key[4];
+                        sendbuf[9] = key[5];
+
+                        memcpy(createCRC, &sendbuf[10], 16);
+                        CRCProc(createCRC, 14, CRC);
+                        sendbuf[24] = CRC[0];
+                        sendbuf[25] = CRC[1];
+
+                        WORD limitStatus = pacarddllproc(readcomno,sendbuflen,sendbuf,&recbuflen,recbuf,Delayms);
+
+                        if((0 != limitStatus)||(0 != recbuf[2]))
+                        {
+                            ClearCardInfoProc(readcomno,
+                                              keymode,
+                                              secnum,
+                                              key,
+                                              Delayms);
+                        //    beepofreaddll(readcomno, '10');
+                       //     ShowMessage("写卡第一块出错，发卡失败！");
+                        //    return;
+                        }
+                        //end write fk hf
+
+                        //写0值到(n+1)*4+2
+                        ZeroMemory(sendbuf,26);
+                        ZeroMemory(recbuf, 140);
+                        ZeroMemory(createCRC, 16);
+                        ZeroMemory(CRC, 2);
+
+                        sendbuf[0] = (secnum+1)*4+2;//扇区×4+块号
+                        sendbuf[1] = 0x60;//固定为0x60
+                        sendbuf[2] = 2;//命令字：1为读，2为写
+                        sendbuf[3] = keymode;
+                        sendbuf[4] = key[0];
+                        sendbuf[5] = key[1];
+                        sendbuf[6] = key[2];
+                        sendbuf[7] = key[3];
+                        sendbuf[8] = key[4];
+                        sendbuf[9] = key[5];
+
+                        memcpy(createCRC, &sendbuf[10], 16);
+                        CRCProc(createCRC, 14, CRC);
+                        sendbuf[24] = CRC[0];
+                        sendbuf[25] = CRC[1];
+
+                        limitStatus = pacarddllproc(readcomno,sendbuflen,sendbuf,&recbuflen,recbuf,Delayms);
+
+                        if((0 != limitStatus)||(0 != recbuf[2]))
+                        {
+                            ClearCardInfoProc(readcomno,
+                                              keymode,
+                                              secnum,
+                                              key,
+                                              Delayms);
+                        //    beepofreaddll(readcomno, '10');
+                        //    ShowMessage("写卡第二块出错，发卡失败！");
+                        //    return;
+                        }
+                        //end write 0
+
+
 						String DateofCancelCard;
 						SYSTEMTIME tmpsystime;
 						GetLocalTime(&tmpsystime);

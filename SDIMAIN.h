@@ -157,6 +157,7 @@
 
 //批量挂失头文件
 #include "BacthGSFRM.h"
+#include "YKHFFRM.h"
 
 //----------------------------------------------------------------------------
 /*#include <ComCtrls.hpp>
@@ -263,6 +264,7 @@ __published:
 	TdxNavBarItem *dxNavBar1Item32;
 	TdxNavBarItem *dxNavBar1Item33;
 	TdxNavBarItem *dxNavBar1Item34;
+	TdxNavBarItem *dxNavBar1Item38;
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall dxNavBar1Item1Click(TObject *Sender);
 	void __fastcall dxNavBar1Item2Click(TObject *Sender);
@@ -330,6 +332,7 @@ __published:
 	void __fastcall dxNavBar1Item32Click(TObject *Sender);
 	void __fastcall dxNavBar1Item33Click(TObject *Sender);
 	void __fastcall dxNavBar1Item34Click(TObject *Sender);
+	void __fastcall dxNavBar1Item38Click(TObject *Sender);
 //	void __fastcall FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 private:
 	TPostLostInfoThread* PostLostInfoThead;

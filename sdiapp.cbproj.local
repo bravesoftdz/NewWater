@@ -336,6 +336,9 @@
     <Transaction>2014-06-13 08:13:18.256.dfm,F:\IC管理系统\InfoMan\noWallet-NoDog\Unit1.dfm=F:\IC管理系统\InfoMan\noWallet-NoDog\StopConsumeShowForm.dfm</Transaction>
     <Transaction>2014-06-13 09:06:02.219.cpp,F:\IC管理系统\InfoMan\noWallet-NoDog\Unit1.cpp=F:\IC管理系统\InfoMan\noWallet-NoDog\StopConsumeExportThread.cpp</Transaction>
     <Transaction>2014-06-13 09:06:02.219.h,F:\IC管理系统\InfoMan\noWallet-NoDog\Unit1.h=F:\IC管理系统\InfoMan\noWallet-NoDog\StopConsumeExportThread.h</Transaction>
+    <Transaction>2014-11-09 09:06:21.347.cpp,F:\GitHub\NewWater\Unit1.cpp=F:\GitHub\NewWater\YKHFFRM.cpp</Transaction>
+    <Transaction>2014-11-09 09:06:21.347.h,F:\GitHub\NewWater\Unit1.h=F:\GitHub\NewWater\YKHFFRM.h</Transaction>
+    <Transaction>2014-11-09 09:06:21.347.dfm,F:\GitHub\NewWater\Unit1.dfm=F:\GitHub\NewWater\YKHFFRM.dfm</Transaction>
   </Transactions>
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="About.cpp"/>
@@ -857,5 +860,9 @@
     <File Path="StopConsumeExportThread.cpp"/>
     <File Path="StopConsumeExportThread.cpp"/>
     <File Path="StopConsumeExportThread.h"/>
+    <File Path="YKHFFRM.cpp"/>
+    <File Path="YKHFFRM.cpp"/>
+    <File Path="YKHFFRM.dfm"/>
+    <File Path="YKHFFRM.h"/>
   </ProjectSortOrder>
 </BorlandProject>

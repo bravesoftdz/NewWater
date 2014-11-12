@@ -3,7 +3,7 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
   Top = 0
   Caption = 'ResendLostCardnewFRM'
   ClientHeight = 597
-  ClientWidth = 734
+  ClientWidth = 900
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clMenuHighlight
@@ -12,6 +12,7 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 16
   object cxGroupBox1: TcxGroupBox
@@ -22,8 +23,9 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
     Align = alTop
     Caption = #26597#35810#26465#20214
     TabOrder = 0
+    ExplicitWidth = 728
     Height = 153
-    Width = 728
+    Width = 894
     object cxRadioButton1: TcxRadioButton
       Left = 24
       Top = 32
@@ -115,6 +117,7 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
       Left = 315
       Top = 25
       Caption = #21345#29366#24577
+      Enabled = False
       Properties.Items = <
         item
           Caption = #22312#29992
@@ -124,6 +127,7 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
         end>
       ItemIndex = 0
       TabOrder = 8
+      Visible = False
       Height = 105
       Width = 76
     end
@@ -135,8 +139,9 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
     Align = alTop
     Caption = #21345#29255#20449#24687
     TabOrder = 1
+    ExplicitWidth = 728
     Height = 272
-    Width = 728
+    Width = 894
     object cxTextEdit5: TcxTextEdit
       Left = 87
       Top = 30
@@ -418,8 +423,9 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
     Align = alTop
     Caption = #34917#21150#25163#32493
     TabOrder = 4
+    ExplicitWidth = 728
     Height = 58
-    Width = 728
+    Width = 894
     object cxLabel7: TcxLabel
       Left = 12
       Top = 23
@@ -436,33 +442,33 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
       StyleHot.LookAndFeel.NativeStyle = True
       TabOrder = 1
       OnKeyPress = cxTextEdit14KeyPress
-      Width = 185
+      Width = 140
     end
     object cxLabel14: TcxLabel
-      Left = 276
+      Left = 231
       Top = 23
       Caption = #34917#21345#21495#65306
     end
     object cxTextEdit18: TcxTextEdit
-      Left = 336
+      Left = 291
       Top = 20
       Properties.MaxLength = 6
-      Properties.ReadOnly = False
+      Properties.ReadOnly = True
       Style.LookAndFeel.NativeStyle = True
       StyleDisabled.LookAndFeel.NativeStyle = True
       StyleFocused.LookAndFeel.NativeStyle = True
       StyleHot.LookAndFeel.NativeStyle = True
       TabOrder = 3
       OnKeyPress = cxTextEdit2KeyPress
-      Width = 185
+      Width = 140
     end
     object cxLabel16: TcxLabel
-      Left = 536
+      Left = 445
       Top = 23
       Caption = #34917#21345#36153#65306
     end
     object cxTextEdit20: TcxTextEdit
-      Left = 599
+      Left = 508
       Top = 20
       Properties.MaxLength = 2
       Properties.ReadOnly = False
@@ -471,6 +477,24 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
       StyleFocused.LookAndFeel.NativeStyle = True
       StyleHot.LookAndFeel.NativeStyle = True
       TabOrder = 5
+      OnKeyPress = cxTextEdit2KeyPress
+      Width = 111
+    end
+    object cxLabel18: TcxLabel
+      Left = 631
+      Top = 23
+      Caption = #34917#21345#27425#25968#65306
+    end
+    object cxTextEdit21: TcxTextEdit
+      Left = 713
+      Top = 20
+      Properties.MaxLength = 2
+      Properties.ReadOnly = True
+      Style.LookAndFeel.NativeStyle = True
+      StyleDisabled.LookAndFeel.NativeStyle = True
+      StyleFocused.LookAndFeel.NativeStyle = True
+      StyleHot.LookAndFeel.NativeStyle = True
+      TabOrder = 7
       OnKeyPress = cxTextEdit2KeyPress
       Width = 111
     end
@@ -512,7 +536,7 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
     AlignWithMargins = True
     Left = 3
     Top = 223
-    Width = 728
+    Width = 894
     Height = 41
     Margins.Top = 6
     Margins.Bottom = 0
@@ -527,6 +551,7 @@ object ResendLostCardnewFRM: TResendLostCardnewFRM
     ParentBackground = False
     ParentFont = False
     TabOrder = 8
+    ExplicitWidth = 728
   end
   object ADOQuery1: TADOQuery
     Connection = SDIAppForm.ADOConnection1

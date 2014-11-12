@@ -118,6 +118,8 @@ __published:	// IDE-managed Components
 	TcxRadioGroup *cxRadioGroup1;
 	TPanel *Panel1;
 	TADOQuery *ADOQuery3;
+	TcxLabel *cxLabel18;
+	TcxTextEdit *cxTextEdit21;
 	void __fastcall cxButton4Click(TObject *Sender);
 	void __fastcall cxRadioButton1Click(TObject *Sender);
 	void __fastcall cxRadioButton2Click(TObject *Sender);
@@ -132,9 +134,12 @@ __published:	// IDE-managed Components
 	void __fastcall cxTextEdit2KeyPress(TObject *Sender, wchar_t &Key);
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall cxTextEdit14KeyPress(TObject *Sender, wchar_t &Key);
+	void __fastcall FormShow(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TResendLostCardnewFRM(TComponent* Owner);
+    int fks;
+    int hfs;
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TResendLostCardnewFRM *ResendLostCardnewFRM;

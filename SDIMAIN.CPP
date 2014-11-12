@@ -2964,3 +2964,11 @@ void __fastcall TSDIAppForm::dxNavBar1Item34Click(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TSDIAppForm::dxNavBar1Item38Click(TObject *Sender)
+{
+	TRect rect = Panel11->ClientRect;
+	YKHFForm->Dock(Panel11, rect);
+	YKHFForm->Show();
+}
+//---------------------------------------------------------------------------
+

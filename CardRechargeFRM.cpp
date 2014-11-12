@@ -172,6 +172,58 @@ void __fastcall TCardRechargeMoneyFRM::ReadCardBTNClick(TObject *Sender) {
 				balance[2] * 256 + (double)balance[3];
 				tmpye = tmpintye / 100;
 
+
+                //check FK and HF
+                int FKS,HFS;
+                unsigned char sendbuflen = 26;
+                unsigned char sendbuf[26];
+                ZeroMemory(sendbuf,26);
+                unsigned char recbuf[140];
+                unsigned char recbuflen;
+                ZeroMemory(recbuf, 140);
+                unsigned char createCRC[16];
+                unsigned char CRC[2];
+                ZeroMemory(createCRC, 16);
+                ZeroMemory(CRC, 2);
+
+                sendbuf[0] = (secnum+1)*4+1;//扇区×4+块号
+                sendbuf[1] = 0x60;//固定为0x60
+                sendbuf[2] = 1;//命令字：1为读，2为写
+                sendbuf[3] = keymode;
+                sendbuf[4] = key[0];
+                sendbuf[5] = key[1];
+                sendbuf[6] = key[2];
+                sendbuf[7] = key[3];
+                sendbuf[8] = key[4];
+                sendbuf[9] = key[5];
+
+                memcpy(createCRC, &sendbuf[10], 16);
+                CRCProc(createCRC, 14, CRC);
+                sendbuf[24] = CRC[0];
+                sendbuf[25] = CRC[1];
+
+                WORD limitStatus = pacarddllproc(readcomno,sendbuflen,sendbuf,&recbuflen,recbuf,Delayms);
+
+                if((0 != limitStatus)||(0 != recbuf[2]))
+                {
+                    beepofreaddll(readcomno, '10');
+                    ShowMessage("读卡第一块出错，换房失败！");
+                    return;
+                }
+                else if((0 == limitStatus)||(0 == recbuf[2]))
+                {
+                 	//here confirm fk and hf
+                 	unsigned char precbuf[16];
+					ZeroMemory(precbuf, 16);
+					memcpy(precbuf, &recbuf[10], 16);
+			   //		if((0x55 == precbuf[14])&&(0xaa == precbuf[15]))
+					{
+                    	FKS = precbuf[0];
+                        HFS = precbuf[2];
+                    }
+                }
+                //end check
+
 				ADOReChargeQuery->Close();
 				ADOReChargeQuery->SQL->Clear();
 				tmpstr = "select * from KZT where kh=";
@@ -220,35 +272,44 @@ void __fastcall TCardRechargeMoneyFRM::ReadCardBTNClick(TObject *Sender) {
 					->AsString;
 					cxTextEdit8->Text = ADOReChargeQuery->FieldByName("XB")
 					->AsString;
-					ADOReChargeQuery->Close();
-					cxTextEdit1->Text = tmpkh;
-					// cxTextEdit16->Text = tmpsycs;
-					cxTextEdit18->Text = tmpye;
-					cxTextEdit6->Text = cardtype[0]; // ??
-					cxTextEdit5->Text = cardtype[0];
-					ReChargeBTN->Enabled = true;
-					ReCharge5BTN->Enabled = true;
-					ReCharge10BTN->Enabled = true;
-					ReCharge20BTN->Enabled = true;
-					ReCharge30BTN->Enabled = true;
-					ReCharge40BTN->Enabled = true;
-					ReCharge50BTN->Enabled = true;
-					ReCharge60BTN->Enabled = true;
-					ReCharge70BTN->Enabled = true;
-					ReCharge80BTN->Enabled = true;
-					ReCharge90BTN->Enabled = true;
-					ReCharge100BTN->Enabled = true;
-					ReCharge150BTN->Enabled = true;
-					ReCharge200BTN->Enabled = true;
-					ReCharge500BTN->Enabled = true;
-					ReCharge1000BTN->Enabled = true;
-					cxButton1->Enabled = true;
-					cxButton2->Enabled = true;
-					cxButton3->Enabled = true;
-					cxButton4->Enabled = true;
-					cxButton5->Enabled = true;
-					beepofreaddll(readcomno, '10');
-					cxTextEdit16->SetFocus();
+
+                    if((FKS == ADOReChargeQuery->FieldByName("FK")->AsInteger)&&(HFS == ADOReChargeQuery->FieldByName("HF")->AsInteger))
+                    {
+                        cxTextEdit1->Text = tmpkh;
+                        // cxTextEdit16->Text = tmpsycs;
+                        cxTextEdit18->Text = tmpye;
+                        cxTextEdit6->Text = cardtype[0]; // ??
+                        cxTextEdit5->Text = cardtype[0];
+                        ReChargeBTN->Enabled = true;
+                        ReCharge5BTN->Enabled = true;
+                        ReCharge10BTN->Enabled = true;
+                        ReCharge20BTN->Enabled = true;
+                        ReCharge30BTN->Enabled = true;
+                        ReCharge40BTN->Enabled = true;
+                        ReCharge50BTN->Enabled = true;
+                        ReCharge60BTN->Enabled = true;
+                        ReCharge70BTN->Enabled = true;
+                        ReCharge80BTN->Enabled = true;
+                        ReCharge90BTN->Enabled = true;
+                        ReCharge100BTN->Enabled = true;
+                        ReCharge150BTN->Enabled = true;
+                        ReCharge200BTN->Enabled = true;
+                        ReCharge500BTN->Enabled = true;
+                        ReCharge1000BTN->Enabled = true;
+                        cxButton1->Enabled = true;
+                        cxButton2->Enabled = true;
+                        cxButton3->Enabled = true;
+                        cxButton4->Enabled = true;
+                        cxButton5->Enabled = true;
+                        beepofreaddll(readcomno, '10');
+                        cxTextEdit16->SetFocus();
+                    }
+                    else
+                    {
+                        ShowMessage("卡已挂失!");
+                        return;
+                    }
+                    ADOReChargeQuery->Close();
 					// ReadCardBTN->Enabled = false;
 				}
 				else {
@@ -371,6 +432,71 @@ void __fastcall TCardRechargeMoneyFRM::Function_ReCharge(double ReChargeMoney) {
                     ReadCardBTN->Enabled = true;
                     return;
                 }
+
+				//使用pacarddll获取最近消费记录
+				unsigned char sendbuf[26];
+				unsigned char sendbuflen = 26;
+				unsigned char senddelay = Delayms;
+				unsigned char recbuf[140];
+				unsigned char recbuflen;
+				unsigned char pblock = (secnum+2)*4+0;
+				unsigned char pmimamode = 0x60;
+				unsigned char pcommand = 0x01;
+				unsigned char pkeymode = 0x03;
+				unsigned char pkey[6];
+				memcpy(pkey,CARDPassword,6);
+				unsigned char comno[5];
+				memcpy(comno,readcomno,5);
+
+				ZeroMemory(sendbuf,26);
+				sendbuf[0] = pblock;//扇区×4+块号
+				sendbuf[1] = pmimamode;//固定为0x60
+				sendbuf[2] = pcommand;//命令字：1为读，2为写
+				sendbuf[3] = pkeymode;
+				sendbuf[4] = pkey[0];
+				sendbuf[5] = pkey[1];
+				sendbuf[6] = pkey[2];
+				sendbuf[7] = pkey[3];
+				sendbuf[8] = pkey[4];
+				sendbuf[9] = pkey[5];
+
+				WORD pstatus;
+				pstatus = pacarddllproc(comno,sendbuflen,sendbuf,&recbuflen,recbuf,senddelay);
+				if((0 == pstatus)&&(0 == recbuf[2]))
+				{
+					//入库
+					unsigned char precbuf[16];
+					ZeroMemory(precbuf, 16);
+					memcpy(precbuf, &recbuf[10], 16);
+					if((0x55 == precbuf[14])&&(0xaa == precbuf[15]))
+					{
+						double xf1;
+						double xf2;
+						int jqh;
+						int cjkh;
+						xf1 = ((double)precbuf[0]+(double)precbuf[1]*256+
+								(double)precbuf[2]*256*256+(double)precbuf[3]*256*256*256)/100;
+						xf2 = ((double)(precbuf[4]^0xff)+(double)(precbuf[5]^0xff)*256+
+								(double)(precbuf[6]^0xff)*256*256+(double)(precbuf[7]^0xff)*256*256*256)/100;
+						if(xf1 == xf2)
+						{
+							jqh = (int)precbuf[8]*256+(int)precbuf[9];
+							cjkh = (int)precbuf[10]*256*256*256+(int)precbuf[11]*256*256+
+									(int)precbuf[12]*256+(int)precbuf[13];
+							//入库操作
+							ADOReChargeQuery->Close();
+							String tjsqlstr = "insert into WTJ values(:JH,:CJKH,:XFZE,:SCSJ)";
+							ADOReChargeQuery->SQL->Clear();
+							ADOReChargeQuery->SQL->Add(tjsqlstr);
+							ADOReChargeQuery->Parameters->ParamByName("JH")->Value = jqh;
+							ADOReChargeQuery->Parameters->ParamByName("CJKH")->Value = cjkh;
+							ADOReChargeQuery->Parameters->ParamByName("XFZE")->Value = xf1;
+							ADOReChargeQuery->Parameters->ParamByName("SCSJ")->Value = DateTimeToStr(Now());
+							ADOReChargeQuery->ExecSQL();
+						}
+					}
+				}
+				//end of pacarddll
 
 				tmpsycs = (int)synum[0] * 256 + (int)synum[1];
 				tmpsycs++;
